@@ -48,7 +48,7 @@ EOF
     chmod 0500 temp-mysql.cnf
     
     #check schema dir exists, if not then pull down sql file from github raw
-    if [ ! -d "$SCHEMA_FOLDER"]; then
+    if [ ! -d "$SCHEMA_FOLDER" ]; then
     cd $ROOT_DIR
     mkdir schema
     curl https://raw.githubusercontent.com/teemops/teemops/master/schema/default.sql --output $SCHEMA_FOLDER/default.sql

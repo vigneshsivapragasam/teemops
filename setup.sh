@@ -5,6 +5,7 @@ echo "Before installing create a blank mysql database called teemops or similar 
 ROOT_DIR=${PWD}
 DEFAULT_DB_NAME=teemopsapp-os
 DEFAULT_FOLDER=teemops-app
+SCHEMA_FOLDER=schema
 REPO_THIS=https://github.com/teemops/teemops.git
 REPO_API=https://github.com/teemops/core-api.git
 REPO_UI=https://github.com/teemops/teemops-ui.git
@@ -45,9 +46,16 @@ password=$3
 EOF
 
     chmod 0500 temp-mysql.cnf
-    #
+    
+    #check schema dir exists, if not then pull down sql file from github raw
+    if [ ! -d "$SCHEMA_FOLDER"]; then
+    cd $ROOT_DIR
+    mkdir schema
+    curl https://raw.githubusercontent.com/teemops/teemops/master/schema/default.sql --output $SCHEMA_FOLDER/default.sql
+    fi
+
     echo $1 $2 $3 $4
-    mysql --defaults-extra-file=temp-mysql.cnf -h $1 $4 < schema/default.sql
+    mysql --defaults-extra-file=temp-mysql.cnf -h $1 $4 < $SCHEMA_FOLDER/default.sql
     rm -f temp-mysql.cnf
     echo 1;
 }

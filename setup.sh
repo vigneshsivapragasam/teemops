@@ -31,6 +31,7 @@ EOF
 update_config_files(){
     cd $ROOT_DIR
     cp -r temp-api-db.conf.json $DEFAULT_FOLDER/core-api/app/config/database.json
+    rm -f temp-api-db.conf.json
 }
 
 install_db(){

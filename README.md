@@ -39,9 +39,15 @@ IAM Policy for local dev or production EC2 instance
 IAM Role and Instance Profile that can be attached to EC2 instance
 IAM Group that dev users can be added to.
 
-Step 1: Run CloudFormation https://github.com/teemops/teemops/cloudformation/iam.ec2.root.role.cfn.yaml
+Step 1: Run CloudFormation https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml
 ```
-aws cloudformation create-stack --stack-name teemops-root-iam --template-url https://github.com/teemops/teemops/cloudformation/iam.ec2.root.role.cfn.yaml
+curl https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml --output iam.ec2.root.role.cfn.yaml && 
+aws cloudformation create-stack --stack-name teemops-root-iam --template-body file://iam.ec2.root.role.cfn.yaml --capabilities CAPABILITY_NAMED_IAM --region us-west-2
+```
+OR from local copy of this repo
+
+```
+aws cloudformation create-stack --stack-name teemops-root-iam --template-body file://cloudformation/iam.ec2.root.role.cfn.yaml --capabilities CAPABILITY_NAMED_IAM --region us-west-2
 ```
 
 If you are runnning on a dev machine locally you will need to ensure your AWS IAM user is attached 
@@ -52,12 +58,12 @@ If you are running on an EC2 Instance you will need to use Instance Profile crea
 Setup is pretty simple. Just download and run this repo's setup.sh script or run the following command on a linux or MAC OSX
 
 ```
-bash <(curl -s https://github.com/teemops/teemops/setup.sh)
+bash <(curl -s https://raw.githubusercontent.com/teemops/teemops/master/setup.sh)
 ```
 If on a MAC you may need to use sudo
 
 ```
-sudo bash <(curl -s https://github.com/teemops/teemops/setup.sh)
+sudo bash <(curl -s https://raw.githubusercontent.com/teemops/teemops/master/setup.sh)
 ```
 
 # Pre-requisites

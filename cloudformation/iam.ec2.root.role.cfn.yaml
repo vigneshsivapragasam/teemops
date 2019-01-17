@@ -10,6 +10,22 @@ Resources:
     Type: "AWS::IAM::Role"
     Properties:
         RoleName: "teemops-root"
+        AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+  TeemOpsInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties: 
+        Roles:
+          - !Ref TeemOpsRole
+        InstanceProfileName: "TeemopsInstanceProfile"
   TeemOpsPolicy:
     Type: "AWS::IAM::Policy"
     Properties: 
@@ -24,6 +40,3 @@ Resources:
             Action: 
               - "sts:AssumeRole"
             Resource: "*"
-      # Groups: 
-      #   - 
-      #     Ref: "TeemOpsGroup"

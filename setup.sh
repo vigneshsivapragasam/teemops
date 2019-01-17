@@ -112,6 +112,14 @@ check_pre(){
 run_aws_install(){
     #installs AWS specific components such as the Ability to STS Assume and launch cloudformation, 
     #serverless components, SQS and Dynamo from the Serverless
+    echo "Would you like to run the AWS setup or run manually - this requires you to setup an IAM Role, Group and Policies? y/n"
+    read aws_yes
+    if aws_yes="y"; then
+        curl https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml --output iam.ec2.root.role.cfn.yaml && 
+aws cloudformation create-stack --stack-name teemops-root-iam --template-body file://iam.ec2.root.role.cfn.yaml --capabilities CAPABILITY_NAMED_IAM --region us-west-2
+    else
+        echo "AWS Setup skipped run manually, see README for more details."
+    fi
 }
 
 install_app (){
@@ -123,7 +131,7 @@ install_app (){
 
     update_config_files
 
-
+    run_aws_install
 
     echo "App Installed succesfully"
     exit

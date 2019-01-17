@@ -1,0 +1,29 @@
+Resources:
+  TeemOpsGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+        GroupName: "teemops-manage"
+        Path: '/'
+        Policies: 
+          - !Ref TeemOpsPolicy
+  TeemOpsRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+        RoleName: "teemops-root"
+  TeemOpsPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties: 
+      PolicyName: "TeemopsSTSAssume"
+      Roles:
+        - !Ref TeemOpsRole
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Action: 
+              - "sts:AssumeRole"
+            Resource: "*"
+      # Groups: 
+      #   - 
+      #     Ref: "TeemOpsGroup"

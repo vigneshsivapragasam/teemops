@@ -3,6 +3,7 @@ echo "Installer starting..."
 echo "Before installing create a blank mysql database called teemops or similar that is accessible from this machine."
 #DEFAULTS
 ROOT_DIR=${PWD}
+export TEEMOPS_ROOT=$ROOT_DIR
 DEFAULT_DB_NAME=teemopsapp-os
 DEFAULT_FOLDER=teemops-app
 SCHEMA_FOLDER=schema
@@ -10,6 +11,7 @@ REPO_THIS=https://github.com/teemops/teemops.git
 REPO_API=https://github.com/teemops/core-api.git
 REPO_UI=https://github.com/teemops/teemops-ui.git
 REPO_BACKEND=https://github.com/teemops/teemops-serverless.git
+CFN_ROOT_IAM=https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml
 
 #functions
 config_api(){
@@ -33,6 +35,15 @@ update_config_files(){
     cd $ROOT_DIR
     cp -r temp-api-db.conf.json $DEFAULT_FOLDER/core-api/app/config/database.json
     rm -f temp-api-db.conf.json
+}
+
+install_npm(){
+    cd $ROOT_DIR/$DEFAULT_FOLDER/core-api
+    npm install
+    cd $ROOT_DIR/$DEFAULT_FOLDER/teemops-ui
+    npm install
+    cd $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless
+    npm install
 }
 
 install_db(){
@@ -121,14 +132,9 @@ check_pre(){
 run_aws_install(){
     #installs AWS specific components such as the Ability to STS Assume and launch cloudformation, 
     #serverless components, SQS and Dynamo from the Serverless
-    echo "Would you like to run the AWS setup or run manually - this requires you to setup an IAM Role, Group and Policies? y/n"
-    read aws_yes
-    if aws_yes="y"; then
-        curl https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml --output iam.ec2.root.role.cfn.yaml && 
-aws cloudformation create-stack --stack-name teemops-root-iam --template-body file://iam.ec2.root.role.cfn.yaml --capabilities CAPABILITY_NAMED_IAM --region us-west-2
-    else
-        echo "AWS Setup skipped run manually, see README for more details."
-    fi
+    curl $CFN_ROOT_IAM --output cfn.root.iam.cfn.yaml && 
+aws cloudformation create-stack --stack-name teemops-root-iam --template-body file://cfn.root.iam.cfn.yaml --capabilities CAPABILITY_NAMED_IAM --region us-west-2
+
 }
 
 install_app (){
@@ -139,17 +145,25 @@ install_app (){
     download
 
     update_config_files
+    
+    install_npm
 
-    run_aws_install
+    echo "Would you like to run the AWS setup or run manually - this requires you to setup an IAM Role, Group and Policies? y/n"
+    read aws_yes
+    if [ "$aws_yes" = "y" ]; then
+        run_aws_install
+    else
+        echo "AWS Setup skipped run manually, see README for more details."
+    fi
 
     echo "App Installed succesfully"
+    list_options
     exit
 }
 
-
 list_options (){
     #Get arguments from user input
-    OPTIONS="Install Download Quit"
+    OPTIONS="Install Download CloudFormation Quit"
     select opt in $OPTIONS; do
         if [ "$opt" = "Quit" ]; then
             echo "User quit"
@@ -158,6 +172,8 @@ list_options (){
             install_app
         elif [ "$opt" = "Download" ]; then
             download
+        elif [ "$opt" = "CloudFormation" ]; then
+            run_aws_install
         else
             clear
             echo bad option

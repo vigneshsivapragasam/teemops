@@ -55,6 +55,10 @@ If you are runnning on a dev machine locally you will need to ensure your AWS IA
 If you are running on an EC2 Instance you will need to use Instance Profile created in the above CloudFormation template.
 
 # Setup
+TODO: 17 Jan 2018
+* setup core-api/app/config/config.json properly from setup.sh script
+* do serverless deploy command as part of setup - AWS option
+
 Setup is pretty simple. Just download and run this repo's setup.sh script or run the following command on a linux or MAC OSX
 
 ```

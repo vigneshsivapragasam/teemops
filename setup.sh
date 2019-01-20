@@ -50,7 +50,7 @@ update_api_config_files(){
     echo "Updating API config..."
 }
 
-update ui_config_files(){
+update_ui_config_files(){
     echo "Updating UI config..."
 }
 
@@ -67,9 +67,6 @@ deploy_serverless(){
    cd $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless
    echo "Deploying serverless"
    serverless deploy --stage $ENV_NAME 
-
-   #update the UI's config file with serverless 
-
 }
 
 install_db(){
@@ -173,6 +170,12 @@ install_app (){
     update_db_config_files
     
     install_npm
+
+    deploy_serverless
+
+    update_api_config_files
+
+    update_ui_config_files
 
     echo "Would you like to run the AWS setup or run manually - this requires you to setup an IAM Role, Group and Policies? y/n"
     read aws_yes

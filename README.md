@@ -4,6 +4,9 @@ Teemops is simplified AWS (Amazon Web Services) management.
 
 It consists of a UI, API and back end processing services.
 
+Current High Level "Release" tasks on Trello:
+https://trello.com/b/vbi94Gjg/teem-ops-open-source
+
 # Components
 Teemops has a number of separate repositories that make up the entire application.
 * API: https://github.com/teemops/core-api
@@ -59,8 +62,8 @@ TODO: 17 Jan 2018
 * setup core-api/app/config/config.json properly from setup.sh script
 * do serverless deploy command as part of setup - AWS option
 
-Setup is pretty simple. Just download and run this repo's setup.sh script or run the following command on a linux or MAC OSX
-
+Setup is pretty simple. 
+OPTION 1: Just download and run this repo's setup.sh script or run the following command on a linux or MAC OSX
 ```
 bash <(curl -s https://raw.githubusercontent.com/teemops/teemops/master/setup.sh)
 ```
@@ -69,6 +72,18 @@ If on a MAC you may need to use sudo
 ```
 sudo bash <(curl -s https://raw.githubusercontent.com/teemops/teemops/master/setup.sh)
 ```
+OPTION 2: Clone this repo and run setup.sh with optional args
+Clone repo and use setup.sh
+
+```
+#clone repo into teemops folder
+git clone https://github.com/teemops/teemops.git
+
+#run setup sh with optional argument
+cd teemops
+setup.sh dev
+```
+
 
 # Pre-requisites
 To run the above needs to be done on a MAC OSX or Ubuntu machine with the following installed:

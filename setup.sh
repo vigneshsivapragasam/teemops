@@ -2,16 +2,25 @@
 echo "Installer starting..."
 echo "Before installing create a blank mysql database called teemops or similar that is accessible from this machine."
 #DEFAULTS
+ENV_NAME=${1:-dev}
 ROOT_DIR=${PWD}
 export TEEMOPS_ROOT=$ROOT_DIR
 DEFAULT_DB_NAME=teemopsapp-os
 DEFAULT_FOLDER=teemops-app
 SCHEMA_FOLDER=schema
+SCRIPTS_FOLDER=scripts
 REPO_THIS=https://github.com/teemops/teemops.git
 REPO_API=https://github.com/teemops/core-api.git
 REPO_UI=https://github.com/teemops/teemops-ui.git
 REPO_BACKEND=https://github.com/teemops/teemops-serverless.git
 CFN_ROOT_IAM=https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml
+
+#Check if this is a locally run copy of the script or a Remote run (curl)
+if( ! -d "$SCRIPTS_FOLDER" ) ; then
+    echo "Pulling down the rest of the repo as well"
+    #now pull down all other assets
+    git clone $REPO_THIS .
+fi
 
 #functions
 config_api(){
@@ -31,10 +40,18 @@ EOF
 
 }
 
-update_config_files(){
+update_db_config_files(){
     cd $ROOT_DIR
     cp -r temp-api-db.conf.json $DEFAULT_FOLDER/core-api/app/config/database.json
     rm -f temp-api-db.conf.json
+}
+
+update_api_config_files(){
+
+}
+
+update ui_config_files(){
+
 }
 
 install_npm(){
@@ -44,6 +61,15 @@ install_npm(){
     npm install
     cd $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless
     npm install
+}
+
+deploy_serverless(){
+   cd $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless
+   echo "Deploying serverless"
+   serverless deploy --stage $ENV_NAME 
+
+   #update the UI's config file with serverless 
+
 }
 
 install_db(){
@@ -144,7 +170,7 @@ install_app (){
     
     download
 
-    update_config_files
+    update_db_config_files
     
     install_npm
 

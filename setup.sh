@@ -47,11 +47,11 @@ update_db_config_files(){
 }
 
 update_api_config_files(){
-
+    echo "Updating API config..."
 }
 
 update ui_config_files(){
-
+    echo "Updating UI config..."
 }
 
 install_npm(){

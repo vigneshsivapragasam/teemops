@@ -15,6 +15,11 @@ Teemops has a number of separate repositories that make up the entire applicatio
 * Services: Not released yet - manages updating of latest AMIs for EC2 actions.
 * Database schema: located in this repo under schema/
 
+# Docs
+Work in progress sits on Google Drive: http://bit.ly/tops-gdrive
+
+https://docs.teemops.com This is a Work in Progress and will be live Feb 2019
+
 # AWS Setup Explanation
 Teemops works using Cross Account IAM Role access which allows it to manage multiple resources in an unlimited number of AWS Accounts.
 

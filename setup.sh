@@ -48,10 +48,12 @@ update_db_config_files(){
 
 update_api_config_files(){
     echo "Updating API config..."
+    node $ROOT_DIR/$DEFAULT_FOLDER/core-api/scripts/setup.js $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless/conf/output.json $ROOT_DIR/$DEFAULT_FOLDER/core-api/app/config/config.json
 }
 
 update_ui_config_files(){
     echo "Updating UI config..."
+    node $ROOT_DIR/$DEFAULT_FOLDER/teemops-ui/scripts/setup.js $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless/conf/output.json $ROOT_DIR/$DEFAULT_FOLDER/teemops-ui/config/dev.json
 }
 
 install_npm(){

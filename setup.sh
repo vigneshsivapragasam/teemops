@@ -16,7 +16,7 @@ REPO_BACKEND=https://github.com/teemops/teemops-serverless.git
 CFN_ROOT_IAM=https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml
 
 #Check if this is a locally run copy of the script or a Remote run (curl)
-if( ! -d "$SCRIPTS_FOLDER" ) ; then
+if( ! -d "$SCHEMA_FOLDER" ) ; then
     echo "Pulling down the rest of the repo as well"
     #now pull down all other assets
     git clone $REPO_THIS .
@@ -46,9 +46,29 @@ update_db_config_files(){
     rm -f temp-api-db.conf.json
 }
 
+generate_secrets(){
+    #Generates the API mysecrets secret for password and confirmation secrets
+    #This will eventually be stored in the API config
+    if which openssl > /dev/null
+    then
+        openssl rand -base64 32 > $DEFAULT_FOLDER/mysecrets.secret
+        openssl rand -base64 32 > $DEFAULT_FOLDER/mysecrets.confirm_secret
+    else
+        LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 16 ; echo  > $DEFAULT_FOLDER/mysecrets.secret
+        LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 16 ; echo  > $DEFAULT_FOLDER/mysecrets.confirm_secret
+    fi
+
+    node $ROOT_DIR/$DEFAULT_FOLDER/core-api/scripts/update_secret.js $ROOT_DIR/$DEFAULT_FOLDER/mysecrets.secret $DEFAULT_FOLDER/core-api/app/config/config.json 'mysecrets.secret'
+    node $ROOT_DIR/$DEFAULT_FOLDER/core-api/scripts/update_secret.js $ROOT_DIR/$DEFAULT_FOLDER/mysecrets.confirm_secret $DEFAULT_FOLDER/core-api/app/config/config.json 'mysecrets.confirm_secret'
+}
+
 update_api_config_files(){
     echo "Updating API config..."
+    cd $ROOT_DIR
+    
+    cp $DEFAULT_FOLDER/core-api/app/config/config.json.sample $DEFAULT_FOLDER/core-api/app/config/config.json 
     node $ROOT_DIR/$DEFAULT_FOLDER/core-api/scripts/setup.js $ROOT_DIR/$DEFAULT_FOLDER/teemops-serverless/conf/output.json $ROOT_DIR/$DEFAULT_FOLDER/core-api/app/config/config.json
+    generate_secrets
 }
 
 update_ui_config_files(){
@@ -122,11 +142,15 @@ prompt_database(){
 }
 
 download(){
+    rm -rf $DEFAULT_FOLDER/core-api
+    rm -rf $DEFAULT_FOLDER/teemops-ui
+    rm -rf $DEFAULT_FOLDER/teemops-serverless
     mkdir $DEFAULT_FOLDER
     cd $DEFAULT_FOLDER
     git clone $REPO_API
     git clone $REPO_UI
     git clone $REPO_BACKEND
+    
 }
 
 check_pre(){
@@ -149,7 +173,9 @@ check_pre(){
     else
         # add deb.nodesource repo commands 
         # install node
-        echo "MySQL needs to be installed first before installing"
+        echo "MySQL needs to be installed first before installing\n"
+        echo "You can run following to ensure mysql is in command line if already installed\n"
+        echo "#export PATH=\$PATH:/Path/to/mysql/bin"
         exit
     fi
 }
@@ -192,9 +218,14 @@ install_app (){
     exit
 }
 
+install_config(){
+    update_api_config_files
+    update_ui_config_files
+}
+
 list_options (){
     #Get arguments from user input
-    OPTIONS="Install Download CloudFormation Quit"
+    OPTIONS="Install Download UpdateConfig CloudFormation Quit"
     select opt in $OPTIONS; do
         if [ "$opt" = "Quit" ]; then
             echo "User quit"
@@ -203,6 +234,8 @@ list_options (){
             install_app
         elif [ "$opt" = "Download" ]; then
             download
+        elif [ "$opt" = "UpdateConfig" ]; then
+            install_config
         elif [ "$opt" = "CloudFormation" ]; then
             run_aws_install
         else

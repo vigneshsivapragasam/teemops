@@ -2,7 +2,14 @@
 
 Teemops is simplified AWS (Amazon Web Services) management.
 
+Join Slack Channel: http://bit.ly/topslack
+
 It consists of a UI, API and back end processing services.
+
+Quick setup:
+```
+bash <(curl -s https://raw.githubusercontent.com/teemops/teemops/master/setup.sh)
+```
 
 Current High Level "Release" tasks on Trello:
 https://trello.com/b/vbi94Gjg/teem-ops-open-source

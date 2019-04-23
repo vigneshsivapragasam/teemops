@@ -14,6 +14,23 @@ REPO_API=https://github.com/teemops/core-api.git
 REPO_UI=https://github.com/teemops/teemops-ui.git
 REPO_BACKEND=https://github.com/teemops/teemops-serverless.git
 CFN_ROOT_IAM=https://raw.githubusercontent.com/teemops/teemops/master/cloudformation/iam.ec2.root.role.cfn.yaml
+OS_VERSION="UNSUPPORTED"
+
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    if [ -f /etc/redhat-release ] ; then
+        #Redhat or CENTOS
+        OS_VERSION="redhat"
+    elif [[ -f /etc/debian_version ]]; then
+        #Ubuntu or Debian
+        OS_VERSION="debian"
+    else
+        OS_VERSION="UNSUPPORTED"
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OS_VERSION="osx"
+else
+    OS_VERSION="UNSUPPORTED"
+fi
 
 #Check if this is a locally run copy of the script or a Remote run (curl)
 if( ! -d "$SCHEMA_FOLDER" ) ; then
@@ -155,6 +172,13 @@ download(){
 
 check_pre(){
     #check pre-requisites
+    if [[ "$OS_VERSION" == "UNSUPPORTED" ]]; then
+        echo "Your OS is unsupported"
+        echo "Please try on one of the following OS:"
+        echo "Redhat, Centos, Ubuntu, Debian, Mac OSX"
+    fi
+PACKAGES_TO_INSTALL=""
+
 # Check if node is installed otherwise exit
     if which node > /dev/null
     then
@@ -163,6 +187,10 @@ check_pre(){
         # add deb.nodesource repo commands 
         # install node
         echo "Node and npm needs to be installed first before installing"
+        echo "Run following command"
+        echo "'curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash'"
+        echo "'nvm install 8'"
+        echo "'nvm alias default 8'"
         exit
     fi
 
@@ -176,6 +204,32 @@ check_pre(){
         echo "MySQL needs to be installed first before installing\n"
         echo "You can run following to ensure mysql is in command line if already installed\n"
         echo "#export PATH=\$PATH:/Path/to/mysql/bin"
+        if [[ "$OS_VERSION" == "redhat" ]]; then
+            echo "yum install mysql-server"
+        elif [[ "$OS_VERSION" == "debian" ]]; then
+            echo "apt-get install mysql-server"
+        elif [[ "$OS_VERSION" == "osx" ]]; then
+            echo "Install via Xcode or Homebrew"
+        fi
+        exit
+    fi
+
+# Check if git is installed otherwise exit
+    if which git > /dev/null
+    then
+        echo "git is installed, skipping..."
+    else
+        # add deb.nodesource repo commands 
+        # install node
+        echo "git needs to be installed first before installing\n"
+        if [[ "$OS_VERSION" == "redhat" ]]; then
+            echo "yum install git"
+        elif [[ "$OS_VERSION" == "debian" ]]; then
+            echo "apt-get install git"
+        elif [[ "$OS_VERSION" == "osx" ]]; then
+            echo "Install via Xcode or Homebrew"
+        fi
+
         exit
     fi
 }

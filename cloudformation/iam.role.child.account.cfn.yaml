@@ -11,6 +11,63 @@ Parameters:
     MaxLength: 12
     Default: '163057906376'
 Resources:
+  TopsCWEventPolicy:
+    Type: AWS::Events::EventBusPolicy
+    Properties: 
+      Action: "events:PutEvents"
+      Principal: !Ref ParentAWSAccountId
+      StatementId: "TopsCWEventsToRootAccount"
+  TopsCWEventRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - 
+            Effect: Allow
+            Principal:
+              Service:
+                - 'events.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'Events:PutEvents'
+                Effect: Allow
+                Resource:
+                  Fn::Join:
+                    - ''
+                    - - 'arn:aws:events:us-west-2:'
+                      - !Ref ParentAWSAccountId
+                      - ':event-bus/default'
+          PolicyName: CWPutEventsTeemOpsPolicy
+  TopsCWRule:
+    # DependsOn: TopsCWEventRole
+    Type: AWS::Events::Rule
+    Properties:
+      Description: 'Teemops Cloudwatch events for when instances shut down and start, reboot'
+      Targets:
+        - 
+          Arn: 
+            Fn::Join:
+              - ''
+              - - 'arn:aws:events:us-west-2:'
+                - !Ref ParentAWSAccountId
+                - ':event-bus/default'
+          Id: "TargetAWSRootTeemops"
+          RoleArn: 
+            Fn::GetAtt:
+              - TopsCWEventRole
+              - Arn
+      EventPattern: '{
+  "source": [
+    "aws.ec2"
+  ],
+  "detail-type": [
+    "EC2 Instance State-change Notification"
+  ]
+}'
   TeemOps:
     Type: 'AWS::IAM::Role'
     Properties:

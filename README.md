@@ -27,6 +27,14 @@ Work in progress sits on Google Drive: http://bit.ly/tops-gdrive
 
 https://docs.teemops.com This is a Work in Progress and will be live Feb 2019
 
+# All Cloudformation templates
+These are located in bucket:
+https://templates.teemops.com.s3-us-west-2.amazonaws.com
+
+IAM templates:
+Root Account: https://templates.teemops.com.s3-us-west-2.amazonaws.com/iam/iam.ec2.root.role.cfn.yaml
+Child Account(s): https://templates.teemops.com.s3-us-west-2.amazonaws.com/iam/iam.role.child.account.cfn.yaml
+
 # AWS Setup Explanation
 Teemops works using Cross Account IAM Role access which allows it to manage multiple resources in an unlimited number of AWS Accounts.
 

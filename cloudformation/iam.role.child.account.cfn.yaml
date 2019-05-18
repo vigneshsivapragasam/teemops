@@ -224,6 +224,7 @@ Resources:
                   - 'cloudformation:CancelUpdateStack'
                   - 'cloudformation:ContinueUpdateRollback'
                   - 'cloudformation:CreateStack'
+                  - 'cloudformation:CreateStackInstances'
                   - 'cloudformation:DescribeAccountLimits'
                   - 'cloudformation:DescribeChangeSet'
                   - 'cloudformation:DescribeStackEvents'
@@ -244,6 +245,20 @@ Resources:
                 Effect: Allow
                 Resource: '*'
           PolicyName: CFNTeemOpsPolicy
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'cloudformation:DeleteStack'
+                Effect: Allow
+                Resource: 'arn:aws:cloudformation:*:*:stack/teemops*/*'
+          PolicyName: CFNDeleteTeemOpsPolicy
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'cloudformation:DeleteStackInstances'
+                Effect: Allow
+                Resource: 'arn:aws:cloudformation:*:*:stackset/teemops*:*'
+          PolicyName: CFNStackDeleteTeemOpsPolicy
         - PolicyDocument:
             Statement:
               - Action:

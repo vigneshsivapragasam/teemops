@@ -13,6 +13,8 @@ Parameters:
     Description: The DNS name of an existing Amazon Route 53 hosted zone
     AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
     ConstraintDescription: must be a valid DNS zone name.
+  SSLArn:
+    Type: String
 Mappings:
   Region2S3WebsiteSuffix:
     us-east-1:
@@ -55,8 +57,7 @@ Resources:
       DistributionConfig:
         Comment: CDN for S3-backed website
         Aliases:
-        - !Join ['', [!Ref 'AWS::StackName', !Ref 'AWS::AccountId', ., !Ref 'AWS::Region',
-            ., !Ref 'HostedZone']]
+        - !Ref 'HostedZone'
         Enabled: 'true'
         DefaultCacheBehavior:
           ForwardedValues:
@@ -64,6 +65,9 @@ Resources:
           TargetOriginId: only-origin
           ViewerProtocolPolicy: allow-all
         DefaultRootObject: index.html
+        ViewerCertificate: 
+          AcmCertificateArn: !Ref SSLArn
+          SslSupportMethod: sni-only
         Origins:
         - CustomOriginConfig:
             HTTPPort: '80'
